@@ -86,9 +86,11 @@ impl Store {
             }
 
             let id = container.id.to_owned().unwrap_or_default();
+            let si = ServiceInfo::from_container_summary(&container);
 
-            self.services
-                .insert(id, ServiceInfo::from_container_summary(&container));
+            if si.values.is_empty() { continue; }
+
+            self.services.insert(id, si);
         }
 
         Ok(())
@@ -101,8 +103,11 @@ impl Store {
 
         for container in docker.containers().list(&clo).await? {
             let id = container.id.to_owned().unwrap_or_default();
-            self.services
-                .insert(id, ServiceInfo::from_container_summary(&container));
+            let si = ServiceInfo::from_container_summary(&container);
+
+            if si.values.is_empty() { continue; }
+
+            self.services.insert(id, si);
         }
 
         Ok(())
